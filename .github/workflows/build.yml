@@ -1,0 +1,30 @@
+name: build
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install zig 0.17.1
+        run: |
+          curl -fsSL https://ziglang.org/download/0.17.1/zig-x86_64-linux-0.17.1.tar.xz -o zig.tar.xz
+          echo "3581863e3cbcfd0fce0efc682ce7e9e93da96668a977791d356a26d2a7e9b17a  zig.tar.xz" | sha256sum -c
+          mkdir zig && tar -xf zig.tar.xz -C zig --strip-components=1
+          echo "$PWD/zig" >> "$GITHUB_PATH"
+      - run: ./build.sh
+      - run: sha256sum trayres.exe | tee trayres.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: trayres
+          path: trayres.exe*
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" trayres.exe trayres.exe.sha256 --title "$GITHUB_REF_NAME" --notes "Built from $GITHUB_SHA by this workflow. SHA-256 in trayres.exe.sha256."
