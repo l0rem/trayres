@@ -50,7 +50,7 @@ public static class Disp {
   public static string IconRect() { var id = new NII(); id.cbSize = Marshal.SizeOf(id); id.hWnd = Tray(); id.uID = 1; RECT r;
     int hr = Shell_NotifyIconGetRect(ref id, out r); return "hr=0x" + hr.ToString("x") + " rect=" + r.L + "," + r.T + "," + r.R + "," + r.B; }
   public static IntPtr OpenMenu() { // what the shell sends on a left click (NOTIFYICON_VERSION_4: NIN_SELECT, anchor in wParam)
-    int x = GetSystemMetrics(0) - 300, y = GetSystemMetrics(1) - 60;
+    int x = GetSystemMetrics(0) / 2, y = GetSystemMetrics(1) - 60;
     PostMessageW(Tray(), 0x8001, new IntPtr((y << 16) | (x & 0xffff)), new IntPtr(0x400 | (1 << 16)));
     for (int i = 0; i < 60; i++) { var w = FindWindowW("#32768", null); if (w != IntPtr.Zero && IsWindowVisible(w)) { Thread.Sleep(300); return w; } Thread.Sleep(50); }
     return IntPtr.Zero; }

@@ -46,10 +46,15 @@ Open the menu, untick **Start with Windows**, click **Exit**, then delete the fo
 
 ## Resource use
 
-It's one thread blocked in `GetMessage`: no timers or polling, and the working set is trimmed after the menu
-closes. Measured on Windows 11 25H2 after 10 minutes idle:
+Its one thread sits blocked in `GetMessage` (Windows adds 3 idle worker threads of its own). There are no timers
+or polling, and the working set is trimmed after the menu closes. Measured with `Get-Process` on Windows 11 25H2 (Ryzen 7 9800X3D) over 10 minutes idle:
 
-IDLE_NUMBERS
+| | |
+|---|---|
+| CPU time used while idle | 0 ms (15.6 ms total, all at startup) |
+| Private bytes | 1.5 MB |
+| Working set | 0.3–0.8 MB |
+| Handles | 132 (mostly shell32's, loaded for the tray icon) |
 
 ## Build
 
